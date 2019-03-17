@@ -29,13 +29,6 @@ with open('frequency_list_orth.txt', 'r') as f:
 
 print '%d words loaded' % len(words)
 
-#print 'Loading freqs'
-#freq = {}
-#with open('wordlist_count_freq.txt', 'r') as f:
-#   for line in f:
-#      pair = eval(line.strip())
-#      freq[pair[0]] = pair[1]
-
 print 'Generating freqs ...'
 pos = 0
 cum = 1
@@ -59,32 +52,44 @@ for word in words:
 
 #print score
 
-print 'Enter each word from your password, one at the time'
-cumpos = 1
+print 'Enter each word from your password, one at the time with proper spelling (important)'
+set_size = 1
+word_cnt = 0
+pass_len = 0
 while True:
+   print '\n> ',
    word = sys.stdin.readline().strip()
    if word == '':
-      cumpos = 1
+      set_size = 1
+      word_cnt = 0
+      pass_len = 0
       print 'Reseting calculations. Clean start'
       continue
+
+   word_cnt += 1
+   pass_len += len(word)
    if word not in score:
-      print 'Your word seems to be uncomon, cannot find the score (password uncracable? check haveibeenpwned)'
+      print 'Your word seems to be uncomon or misspelled, cannot find the score (password uncracable? check haveibeenpwned)'
+      print 'Assuming whole word set as crack set, %d words' % len(score)
+      set_size = max(set_size, len(score))
    else:
       hit = score[word]
-      cumpos *= hit[1]
-      print '\"%s\" is used %d times on place %d, cumulative pos %d' % (word,hit[0],hit[1],cumpos)
-      print 'password entropy %f bits' % (math.log(float(cumpos),2))
-      seconds = operator.truediv(cumpos,23012000000)
-      if seconds < 60:
-         print 'crackable in %d seconds' % seconds
-      elif seconds / 60 < 60:
-         print 'crackable in %d minutes' % (seconds/60)
-      elif seconds / 3600 < 24:
-         print 'crackable in %d hours' % (seconds/3600)
-      elif seconds / (3600 * 24) < 365:
-         print 'crackable in %d days' % (seconds / (3600 * 24))
-      else: 
-         print 'crackable in %d years' % (seconds / (3600 * 24 * 365))
-         
-
+      set_size = max(set_size, hit[1])
+      print '\"%s\" rank #%d used %d times, minimal word set size %d' % (word,hit[1],hit[0],set_size)
+      
+   word_perm = pow(set_size, word_cnt)
+   brute_perm = pow(26, pass_len)
    
+   print '%d word password entropy %f bits' % (word_cnt, math.log(float(word_perm),2))
+   print '%d letters bruteforce password entropy %f bits' % (pass_len, math.log(float(brute_perm),2))
+   seconds = operator.truediv(min(word_perm, brute_perm),23012000000) #magic number is hashrate of 8 Nvidia 1080 for sha256
+   if seconds < 60:
+      print 'crackable in %d seconds' % seconds
+   elif seconds / 60 < 60:
+      print 'crackable in %d minutes' % (seconds/60)
+   elif seconds / 3600 < 24:
+      print 'crackable in %d hours' % (seconds/3600)
+   elif seconds / (3600 * 24) < 365:
+      print 'crackable in %d days' % (seconds / (3600 * 24))
+   else: 
+      print 'crackable in %d years' % (seconds / (3600 * 24 * 365))
