@@ -9,14 +9,15 @@ The idea behind this tool is to verify the real entropy of passphrase based on
 several words stiched toghether. 
 
 In the past companies followed NIST recomendations that force users to use set
-of characters and certain length in password, which creates password that are
-hard to remember and easy to crack. 
+of characters and certain password length. By human nature, this lead to passwords
+that are hard to remember and easy to crack. 
 
-New NIST recommendations suggest to just use long password like in form of several
-words connected together. The idea behind this is that such password is easy to
-remember and hard to crack.
+New NIST recommendations just suggest to use long password. Common aproach is
+several words stiched together as such phrases are easy to remember. Those
+passphrases are hard to crack as the cracking resistance comes from much bigger 
+key space.
 
-The cracking resistance comes from much bigger key space.
+Let's compare:
 
 8 character password with base set of [a-z][A-Z][0-9][_?!@#$%^&*()]:
 
@@ -27,11 +28,10 @@ Password made from 5 words (lets assume 5000 word set)
 Key space = 5000^5 = 3.1e18
 
 But there is a caveat in those calculations. We assumed that all words came from
-certain set, which in real life does not have to be large as in our
-calculations. Users have the tendency to use common words from much smaller set.
-In that case the entropy drops dramaticly.  And that's why it is important to
-verify how common are words used in your password. And that's why this tool is
-handy.
+certain set size, which in real life does not have to be large as in our
+calculations. Users have the tendency to use common words and this creates much 
+smaller cracking set. In that case the entropy drops dramaticly. And that's why
+it is important to verify how common are words used in your password.
 
 Some may disagree that using "leetspeek" or mixing capital letters make small word
 set attack impractical but in fact, using those tricks only increase the set by
