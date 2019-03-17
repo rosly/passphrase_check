@@ -6,11 +6,49 @@ import operator
 import os  
 import signal
 import random
+import string
 import sys, getopt
 
 def signal_handler(sig, frame):
         print('SIGINT ... exiting')
         sys.exit(0)
+
+def crackability(combinations, suffix):
+   seconds = operator.truediv(combinations, 23012000000) #magic number is hashrate of 8 Nvidia 1080 for sha256
+   if seconds < 60:
+      print 'crackable in %d seconds %s' % (seconds, suffix)
+   elif seconds / 60 < 60:
+      print 'crackable in %d minutes %s' % (seconds/60, suffix)
+   elif seconds / 3600 < 24:
+      print 'crackable in %d hours %s' % (seconds/3600, suffix)
+   elif seconds / (3600 * 24) < 365:
+      print 'crackable in %d days %s' % (seconds / (3600 * 24), suffix)
+   else:
+      print 'crackable in %d years %s' % (seconds / (3600 * 24 * 365), suffix)
+
+def charset_size(passphrase):
+   special = ['_', '?', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')']
+   lowercase = set(string.ascii_lowercase)
+   uppercase = set(string.ascii_uppercase)
+   digits = set(string.digits)
+   charset_size = 0
+   for c in passphrase:
+      if c in special:
+         charset_size += len(special)
+         break
+   for c in passphrase:
+      if c in lowercase:
+         charset_size += len(lowercase)
+         break
+   for c in passphrase:
+      if c in uppercase:
+         charset_size += len(uppercase)
+         break
+   for c in passphrase:
+      if c in digits:
+         charset_size += len(digits)
+         break
+   return charset_size
 
 def main(argv):
 
@@ -82,6 +120,7 @@ def main(argv):
    set_size = 1
    word_cnt = 0
    pass_len = 0
+   cssize = 0
    while True:
       print '\n> ',
       word = sys.stdin.readline().strip()
@@ -89,6 +128,7 @@ def main(argv):
          set_size = 1
          word_cnt = 0
          pass_len = 0
+         cssize = 0
          print 'Reseting calculations. Clean start'
          continue
 
@@ -104,21 +144,13 @@ def main(argv):
          print '\"%s\" rank #%d used %d times, minimal word set size %d' % (word,hit[1],hit[0],set_size)
          
       word_perm = pow(set_size, word_cnt)
-      brute_perm = pow(26, pass_len)
+      cssize = max(1, max(cssize, charset_size(word)))
+      brute_perm = pow(cssize, pass_len)
       
       print '%d word password entropy %f bits' % (word_cnt, math.log(float(word_perm),2))
       print '%d letters bruteforce password entropy %f bits' % (pass_len, math.log(float(brute_perm),2))
-      seconds = operator.truediv(min(word_perm, brute_perm),23012000000) #magic number is hashrate of 8 Nvidia 1080 for sha256
-      if seconds < 60:
-         print 'crackable in %d seconds' % seconds
-      elif seconds / 60 < 60:
-         print 'crackable in %d minutes' % (seconds/60)
-      elif seconds / 3600 < 24:
-         print 'crackable in %d hours' % (seconds/3600)
-      elif seconds / (3600 * 24) < 365:
-         print 'crackable in %d days' % (seconds / (3600 * 24))
-      else: 
-         print 'crackable in %d years' % (seconds / (3600 * 24 * 365))
+      crackability(word_perm, 'by word rule based method')
+      crackability(brute_perm, 'by %d charset bruteforce method' % cssize)
 
 if __name__ == "__main__":
    main(sys.argv[1:])
