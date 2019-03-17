@@ -1,4 +1,4 @@
-# Phrase password checker
+# Passphrase entropy checker
 
 This simple phrase password checker allows you to estimate the entropy of your
 password.

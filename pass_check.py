@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: iso-8859-15 -*-
 import sys
 import math
 import operator
@@ -53,6 +55,8 @@ for word in words:
 #print score
 
 print 'Enter each word from your password, one at the time with proper spelling (important)'
+print 'Example:\n> chrząszcz\n> brzebrzydły\n> moczymorda'
+print 'Enter empty line to reset calculations'
 set_size = 1
 word_cnt = 0
 pass_len = 0
