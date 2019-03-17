@@ -27,7 +27,7 @@ def crackability(combinations, suffix):
       print 'crackable in %d years %s' % (seconds / (3600 * 24 * 365), suffix)
 
 def charset_size(passphrase):
-   special = ['_', '?', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')']
+   special = ['_', '?', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', ' ']
    lowercase = set(string.ascii_lowercase)
    uppercase = set(string.ascii_uppercase)
    digits = set(string.digits)
@@ -50,24 +50,30 @@ def charset_size(passphrase):
          break
    return charset_size
 
+def usage():
+   print './pass_check.py [-l LANG_CODE]'
+
 def main(argv):
 
    freq_list_url = 'https://raw.githubusercontent.com/hermitdave/FrequencyWords/master/content/2018'
-   lang = 'pl'
+   lang = ''
 
    try:
       opts, args = getopt.getopt(argv,"l:",["lang="])
    except getopt.GetoptError:
-      print './pass_check.py [-l LANG_CODE]'
+      usage()
       sys.exit(2)
    for opt, argval in opts:
       if opt in ("-l", "--lang="):
          print 'Got lang %s' % argval
          lang = argval
       else:
-         print './pass_check.py [-l LANG_CODE]'
+         usage()
          sys.exit(2)
 
+   if lang == '':
+      usage()
+      sys.exit(2);
    freq_list_file = '%s_full.txt' % lang
 
    if not os.path.exists(freq_list_file):
@@ -115,7 +121,7 @@ def main(argv):
 #print score
 
    print 'Enter each word from your password, one at the time with proper spelling (important)'
-   print 'Example:\n> chrząszcz\n> brzebrzydły\n> moczymorda'
+   print 'Example:\n> chrząszcz\n> przebrzydły\n> moczymorda'
    print 'Enter empty line to reset calculations'
    set_size = 1
    word_cnt = 0
