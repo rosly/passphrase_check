@@ -97,7 +97,7 @@ def main(argv):
 
    print '%d words loaded' % len(words)
 
-   print 'Generating freqs ...'
+   print 'Generating commonness ranks ...'
    pos = 0
    cum = 1
    prev_count = 0
@@ -113,12 +113,11 @@ def main(argv):
 
 #print freq
 
-   score = {}
+   crank = {}
    for word in words:
-      seq = (word[1], freq[word[1]])
-      score[word[0]] = seq
+      crank[word[0]] = (word[1], freq[word[1]])
 
-#print score
+#print crank
 
    print 'Enter each word from your password, one at the time with proper spelling (important)'
    print 'Example:\n> chrząszcz\n> przebrzydły\n> moczymorda'
@@ -140,14 +139,14 @@ def main(argv):
 
       word_cnt += 1
       pass_len += len(word)
-      if word not in score:
-         print 'Your word seems to be uncomon or misspelled, cannot find the score (password uncracable? check haveibeenpwned)'
-         print 'Assuming whole word set as crack set, %d words' % len(score)
-         set_size = max(set_size, len(score))
+      if word not in crank:
+         print 'Your word seems to be uncomon or misspelled, cannot find it in dictionary (password uncracable? check haveibeenpwned.com)'
+         print 'Assuming whole word set as crack set, %d words' % len(crank)
+         set_size = max(set_size, len(crank))
       else:
-         hit = score[word]
+         hit = crank[word]
          set_size = max(set_size, hit[1])
-         print '\"%s\" rank #%d used %d times, minimal word set size %d' % (word,hit[1],hit[0],set_size)
+         print '\"%s\" commonness #%d used %d times, minimal word set size %d' % (word,hit[1],hit[0],set_size)
          
       word_perm = pow(set_size, word_cnt)
       cssize = max(1, max(cssize, charset_size(word)))
