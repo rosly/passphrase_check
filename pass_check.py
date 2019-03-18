@@ -163,9 +163,9 @@ def main(argv):
       print '\n%d word password based entropy %f bits' % (word_cnt, math.log(float(word_perm),2))
       print 'dictionaty + rules method crack times:'
       cracktime(word_perm)
-      print '\n%d letters with %d charset password based entropy %f bits' % (pass_len, cssize, math.log(float(brute_perm),2))
-      print 'bruteforce crack times:'
-      cracktime(brute_perm)
+#print '\n%d letters with %d charset password based entropy %f bits' % (pass_len, cssize, math.log(float(brute_perm),2))
+#print 'bruteforce crack times:'
+#cracktime(brute_perm)
 
       print '\n\nType next word or just enter to reset estimations'
 
