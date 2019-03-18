@@ -13,18 +13,26 @@ def signal_handler(sig, frame):
         print('SIGINT ... exiting')
         sys.exit(0)
 
-def crackability(combinations, suffix):
-   seconds = operator.truediv(combinations, 23012000000) #magic number is hashrate of 8 Nvidia 1080 for sha256
+def crackability(combinations, speed):
+   seconds = operator.truediv(combinations, speed)
    if seconds < 60:
-      print 'crackable in %d seconds %s' % (seconds, suffix)
+      return '%d seconds' % (seconds)
    elif seconds / 60 < 60:
-      print 'crackable in %d minutes %s' % (seconds/60, suffix)
+      return '%d minutess' % (seconds/60)
    elif seconds / 3600 < 24:
-      print 'crackable in %d hours %s' % (seconds/3600, suffix)
+      return '%d hours' % (seconds/3600)
    elif seconds / (3600 * 24) < 365:
-      print 'crackable in %d days %s' % (seconds / (3600 * 24), suffix)
+      return '%d days' % (seconds / (3600 * 24))
    else:
-      print 'crackable in %d years %s' % (seconds / (3600 * 24 * 365), suffix)
+      return '%d years' % (seconds / (3600 * 24 * 365))
+
+def cracktime(combinations):
+   # crack speeds taken from https://gist.github.com/epixoip/a83d38f412b4737e99bbef804a270c40
+   print 'SHA1            in %s' % crackability(combinations, 68771000000)
+   print 'SHA256          in %s' % crackability(combinations, 8408000000)
+   print 'PBKDF2-HMAC-MD5 in %s' % crackability(combinations, 59296000)
+   print 'scrypt          in %s' % crackability(combinations, 3493000)
+   print 'WPA/WPA2        in %s' % crackability(combinations, 3177000)
 
 def charset_size(passphrase):
    special = ['_', '?', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', ' ']
@@ -121,13 +129,13 @@ def main(argv):
 
    print 'Enter each word from your password, one at the time with proper spelling (important)'
    print 'Example:\n> chrząszcz\n> przebrzydły\n> moczymorda'
-   print 'Enter empty line to reset calculations'
+   print 'Enter empty line to reset calculations\n'
    set_size = 1
    word_cnt = 0
    pass_len = 0
    cssize = 0
    while True:
-      print '\n> ',
+      print '> ',
       word = sys.stdin.readline().strip()
       if word == '':
          set_size = 1
@@ -141,7 +149,7 @@ def main(argv):
       pass_len += len(word)
       if word not in crank:
          print 'Your word seems to be uncomon or misspelled, cannot find it in dictionary (password uncracable? check haveibeenpwned.com)'
-         print 'Assuming whole word set as crack set, %d words' % len(crank)
+         print 'Assuming whole dictionary for cracking with dict + rules, %d words' % len(crank)
          set_size = max(set_size, len(crank))
       else:
          hit = crank[word]
@@ -152,10 +160,14 @@ def main(argv):
       cssize = max(1, max(cssize, charset_size(word)))
       brute_perm = pow(cssize, pass_len)
       
-      print '%d word password entropy %f bits' % (word_cnt, math.log(float(word_perm),2))
-      print '%d letters bruteforce password entropy %f bits' % (pass_len, math.log(float(brute_perm),2))
-      crackability(word_perm, 'by word rule based method')
-      crackability(brute_perm, 'by %d charset bruteforce method' % cssize)
+      print '\n%d word password based entropy %f bits' % (word_cnt, math.log(float(word_perm),2))
+      print 'dictionaty + rules method crack times:'
+      cracktime(word_perm)
+      print '\n%d letters with %d charset password based entropy %f bits' % (pass_len, cssize, math.log(float(brute_perm),2))
+      print 'bruteforce crack times:'
+      cracktime(brute_perm)
+
+      print '\n\nType next word or just enter to reset estimations'
 
 if __name__ == "__main__":
    main(sys.argv[1:])
