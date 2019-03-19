@@ -154,13 +154,13 @@ def main(argv):
       else:
          hit = crank[word]
          set_size = max(set_size, hit[1])
-         print '\"%s\" commonness #%d used %d times, minimal word set size %d' % (word,hit[1],hit[0],set_size)
+         print '\"%s\" commonness #%d used %d times' % (word,hit[1],hit[0])
          
       word_perm = pow(set_size, word_cnt)
       cssize = max(1, max(cssize, charset_size(word)))
       brute_perm = pow(cssize, pass_len)
       
-      print '\n%d word password based entropy %f bits' % (word_cnt, math.log(float(word_perm),2))
+      print '\n%d word password based entropy %f bits, minimal dictionary size %d' % (word_cnt, math.log(float(word_perm),2), set_size)
       print 'dictionaty + rules method crack times:'
       cracktime(word_perm)
 #print '\n%d letters with %d charset password based entropy %f bits' % (pass_len, cssize, math.log(float(brute_perm),2))
